@@ -2,11 +2,11 @@ from cmath import exp
 import logging
 import os
 from itertools import islice
-from turtle import bgcolor
 
 
 import flet
 from flet import (
+    AlertDialog,
     Column,
     Container,
     GridView,
@@ -41,16 +41,81 @@ from flet import (
 # Views - Different views of boards (timeline, table, etc.)
 cardLists = []
 cardList = {}
-boards = []
+boardNav = [
+    NavigationRailDestination(
+
+        padding=padding.all(5),
+        # label_content=Row(
+        #     [Text("Empty Board")]
+        # )
+        label_content=Text("Empty Board"),
+        selected_icon=icons.CHEVRON_RIGHT_ROUNDED
+    )
+]
+boards = [
+    Column([Text("Create a list!")],
+           alignment="start", expand=True)
+]
 
 
 def main(page: Page):
     page.title = "Flet Trello clone"
-    # page.theme_mode = "dark"
     page.bgcolor = colors.LIGHT_GREEN_400
+    currentBoardIndex: int = 0
 
     def search_board(e):
         "TODO"
+
+    def createNewBoard(e):
+
+        sidebar.destinations.append(
+            NavigationRailDestination(
+
+                padding=padding.all(5),
+                # label_content=Row(
+                #     [Text("Empty Board")]
+                # )
+                label_content=Text(e.control.value),
+                label=e.control.value,
+                selected_icon=icons.CHEVRON_RIGHT_ROUNDED
+            )
+        )
+
+        boards.append(
+            Column([Text("Welcome to your new board!")],
+                   alignment="start", expand=True)
+        )
+        print(boards)
+        currentBoardIndex = len(sidebar.destinations) - 1
+        sidebar.selected_index = currentBoardIndex
+        print(currentBoardIndex)
+        page.update()
+
+    def addBoard(e):
+        def close_dlg(e):
+            createNewBoard(e)
+            dialog.open = False
+            page.update()
+        dialog = AlertDialog(
+            title=Text("Name your new board"),
+            content=Column(
+                [TextField(label="New Board Name", on_submit=close_dlg)], tight=True),
+
+            # actions=[
+            #     TextButton("OK", on_click=close_dlg)
+            # ],
+            # actions_alignment="start",
+            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        )
+        page.dialog = dialog
+        dialog.open = True
+        page.update()
+
+    def navRail_change(e):
+        currentBoardIndex = e.control.selected_index
+        print("Selected destination: ",
+              e.control.selected_index, currentBoardIndex)
+        page.update()
 
     page.appbar = AppBar(
         leading=Icon(icons.GRID_GOLDENRATIO_ROUNDED),
@@ -89,23 +154,13 @@ def main(page: Page):
     )
 
     sidebar = NavigationRail(
-        destinations=[
-            NavigationRailDestination(
-
-                padding=padding.all(5),
-                # label_content=Row(
-                #     [Text("Empty Board")]
-                # )
-                label_content=Text("Empty Board"),
-                selected_icon=icons.CHEVRON_RIGHT_ROUNDED
-            ),
-            *boards
-        ],
+        destinations=boardNav,
         bgcolor=colors.LIGHT_GREEN_700,
         leading=Container(
             content=Row(
                 controls=[
-                    TextButton("Add new board", icon=icons.ADD),
+                    TextButton("Add new board", icon=icons.ADD,
+                               on_click=addBoard),
                     # Text("Add new board", text_align="center", weight="w500"),
                     # IconButton(icon=icons.ADD, icon_size=20)
                 ],
@@ -117,20 +172,17 @@ def main(page: Page):
             padding=padding.all(0),
             margin=margin.all(0)
         ),
+        on_change=navRail_change,
         selected_index=0,
         extended=True
     )
-
-    def addBoard():
-        "TODO"
 
     page.add(
         Row(
             [
                 sidebar,
                 VerticalDivider(width=2),
-                Column([Text("Create a list!")],
-                       alignment="start", expand=True)
+                boards[currentBoardIndex]
             ],
             expand=True
         )
