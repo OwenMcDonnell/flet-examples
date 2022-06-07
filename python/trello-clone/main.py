@@ -3,7 +3,7 @@ import logging
 import os
 from itertools import islice
 from turtle import update
-
+from board import Board
 import flet
 from flet import (
     AlertDialog,
@@ -83,11 +83,12 @@ def main(page: Page):
                 selected_icon=icons.CHEVRON_RIGHT_ROUNDED
             )
         )
-
-        boards.append(
-            Column([Text("Welcome to your new board!")],
-                   alignment="start", expand=True)
-        )
+        newBoard = Board(page, e.control.value)
+        boards.append(newBoard.mainView)
+        # boards.append(
+        #     Column([Text("Welcome to your new board!")],
+        #            alignment="start", expand=True)
+        # )
         print(boards)
         nonlocal currentBoardIndex  # needed to access nested function "global"
         nonlocal currentBoard
