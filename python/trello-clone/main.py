@@ -2,7 +2,7 @@ from cmath import exp
 import logging
 import os
 from itertools import islice
-
+from turtle import update
 
 import flet
 from flet import (
@@ -39,11 +39,11 @@ from flet import (
 # trello app
 # MVP  - Boards -> Lists -> Cards
 # Views - Different views of boards (timeline, table, etc.)
+
 cardLists = []
 cardList = {}
 boardNav = [
     NavigationRailDestination(
-
         padding=padding.all(5),
         # label_content=Row(
         #     [Text("Empty Board")]
@@ -52,7 +52,9 @@ boardNav = [
         selected_icon=icons.CHEVRON_RIGHT_ROUNDED
     )
 ]
+
 boards = [
+    # board placeholder untethered to nav item
     Column([Text("Create a list!")],
            alignment="start", expand=True)
 ]
@@ -62,6 +64,7 @@ def main(page: Page):
     page.title = "Flet Trello clone"
     page.bgcolor = colors.LIGHT_GREEN_400
     currentBoardIndex: int = 0
+    currentBoard = boards[currentBoardIndex]
 
     def search_board(e):
         "TODO"
@@ -86,10 +89,14 @@ def main(page: Page):
                    alignment="start", expand=True)
         )
         print(boards)
+        nonlocal currentBoardIndex  # needed to access nested function "global"
+        nonlocal currentBoard
         currentBoardIndex = len(sidebar.destinations) - 1
+        mainView.controls.remove(currentBoard)
+        currentBoard = boards[currentBoardIndex]
+        mainView.controls.append(currentBoard)
         sidebar.selected_index = currentBoardIndex
         print(currentBoardIndex)
-        page.update()
 
     def addBoard(e):
         def close_dlg(e):
@@ -100,11 +107,6 @@ def main(page: Page):
             title=Text("Name your new board"),
             content=Column(
                 [TextField(label="New Board Name", on_submit=close_dlg)], tight=True),
-
-            # actions=[
-            #     TextButton("OK", on_click=close_dlg)
-            # ],
-            # actions_alignment="start",
             on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
         page.dialog = dialog
@@ -112,10 +114,17 @@ def main(page: Page):
         page.update()
 
     def navRail_change(e):
+        nonlocal currentBoardIndex
+        nonlocal currentBoard
         currentBoardIndex = e.control.selected_index
+        if currentBoard in mainView.controls:
+            mainView.controls.remove(currentBoard)
+        currentBoard = boards[e.control.selected_index]
+        mainView.controls.append(currentBoard)
         print("Selected destination: ",
-              e.control.selected_index, currentBoardIndex)
+              e.control.selected_index)
         page.update()
+        print("navRail_change called")
 
     page.appbar = AppBar(
         leading=Icon(icons.GRID_GOLDENRATIO_ROUNDED),
@@ -163,9 +172,7 @@ def main(page: Page):
                                on_click=addBoard),
                     # Text("Add new board", text_align="center", weight="w500"),
                     # IconButton(icon=icons.ADD, icon_size=20)
-                ],
-                # alignment="spaceEvenly",
-                # expand=True
+                ]
             ),
             border_radius=border_radius.all(35),
             bgcolor=colors.WHITE12,
@@ -177,16 +184,15 @@ def main(page: Page):
         extended=True
     )
 
-    page.add(
-        Row(
-            [
-                sidebar,
-                VerticalDivider(width=2),
-                boards[currentBoardIndex]
-            ],
-            expand=True
-        )
+    mainView = Row(
+        [
+            sidebar,
+            VerticalDivider(width=2),
+            currentBoard
+        ],
+        expand=True
     )
+    page.add(mainView)
     # page.add(Text("Sanity Check"))
 
 
