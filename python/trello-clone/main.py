@@ -24,9 +24,12 @@ from flet import (
     VerticalDivider,
     Divider,
     AppBar,
+    Checkbox,
+    ListTile,
     PopupMenuButton,
     PopupMenuItem,
     TextField,
+    Switch,
     alignment,
     border_radius,
     colors,
@@ -40,38 +43,92 @@ from flet import (
 # MVP  - Boards -> Lists -> Cards
 # Views - Different views of boards (timeline, table, etc.)
 
-cardLists = []
-cardList = {}
-boardNav = [
-    NavigationRailDestination(
-        padding=padding.all(5),
-        # label_content=Row(
-        #     [Text("Empty Board")]
-        # )
-        label_content=Text("Empty Board"),
-        selected_icon=icons.CHEVRON_RIGHT_ROUNDED
-    )
-]
 
-boards = [
-    # board placeholder untethered to nav item
-    Column([Text("Create a list!")],
-           alignment="start", expand=True)
-]
+class TrelloApp:
+    def __init__(self, page: Page):
+        self.page = page
+        self.cardLists = []
+        self.cardList = {}
+        self.sidebar = NavigationRail(
+            destinations=[
+                NavigationRailDestination(
+                    padding=padding.all(5),
+                    # label_content=Row(
+                    #     [Text("Empty Board")]
+                    # )
+                    label_content=Text("Empty Board"),
+                    selected_icon=icons.CHEVRON_RIGHT_ROUNDED
+                )
+            ],
+            bgcolor=colors.LIGHT_GREEN_700,
+            leading=Container(
+                content=Row(
+                    controls=[
+                        TextButton("Add new board", icon=icons.ADD,
+                                   on_click=self.addBoard),
+                        # Text("Add new board", text_align="center", weight="w500"),
+                        # IconButton(icon=icons.ADD, icon_size=20)
+                    ]
+                ),
+                border_radius=border_radius.all(35),
+                bgcolor=colors.WHITE12,
+                padding=padding.all(0),
+                margin=margin.all(0)
+            ),
+            on_change=self.navRail_change,
+            selected_index=0,
+            extended=True
+        )
+
+        self.boards = [
+            Board(self.page, self, "Empty Board")
+            # board placeholder untethered to nav item
+            # Column([Text("Create a list!")],
+            #        alignment="start", expand=True)
 
 
-def main(page: Page):
-    page.title = "Flet Trello clone"
-    page.bgcolor = colors.LIGHT_GREEN_400
-    currentBoardIndex: int = 0
-    currentBoard = boards[currentBoardIndex]
+            # Column(
+            #     controls=[
+            #         Switch(label="Horizontal/Veritcal List View",
+            #                value=False, label_position="left"),
+            #         Row(
+            #             controls=[
+            #                 Container(
+            #                     content=Column([
+            #                         Checkbox(label="first item"),
+            #                         Checkbox(label="second item"),
+            #                         Checkbox(label="Third item")
 
-    def search_board(e):
-        "TODO"
+            #                     ], expand=True),
+            #                     border_radius=border_radius.all(15),
+            #                     bgcolor=colors.WHITE24,
+            #                     padding=padding.all(20),
+            #                     margin=margin.all(10),
+            #                 )
+            #             ],
+            #             expand=True
+            #         )
+            #     ]
+            # )
+        ]
+        self.currentBoardIndex: int = 0
+        self.currentBoard = self.boards[self.currentBoardIndex]
+        self.view = Row(
+            [
+                self.sidebar,
+                VerticalDivider(width=2),
+                self.currentBoard.mainView
+            ],
+            expand=True
+        )
 
-    def createNewBoard(e):
+    def update(self):
+        self.currentBoard = self.boards[self.currentBoardIndex]
+        self.view.update()
 
-        sidebar.destinations.append(
+    def createNewBoard(self, e):
+
+        self.sidebar.destinations.append(
             NavigationRailDestination(
 
                 padding=padding.all(5),
@@ -83,50 +140,52 @@ def main(page: Page):
                 selected_icon=icons.CHEVRON_RIGHT_ROUNDED
             )
         )
-        newBoard = Board(page, e.control.value)
-        boards.append(newBoard.mainView)
-        # boards.append(
-        #     Column([Text("Welcome to your new board!")],
-        #            alignment="start", expand=True)
-        # )
-        print(boards)
-        nonlocal currentBoardIndex  # needed to access nested function "global"
-        nonlocal currentBoard
-        currentBoardIndex = len(sidebar.destinations) - 1
-        mainView.controls.remove(currentBoard)
-        currentBoard = boards[currentBoardIndex]
-        mainView.controls.append(currentBoard)
-        sidebar.selected_index = currentBoardIndex
-        print(currentBoardIndex)
+        newBoard = Board(self, e.control.value)
+        self.boards.append(newBoard)
+        # nonlocal currentBoardIndex  # needed to access nested function "global"
+        # nonlocal currentBoard
 
-    def addBoard(e):
+        self.view.controls.remove(self.boards[self.currentBoardIndex].mainView)
+        self.currentBoardIndex = len(self.sidebar.destinations) - 1
+        #currentBoard = self.boards[self.currentBoardIndex]
+        self.view.controls.append(self.boards[self.currentBoardIndex].mainView)
+        self.sidebar.selected_index = self.currentBoardIndex
+        # print(self.currentBoardIndex)
+
+    def addBoard(self, e):
         def close_dlg(e):
-            createNewBoard(e)
+            self.createNewBoard(e)
             dialog.open = False
-            page.update()
+            self.page.update()
         dialog = AlertDialog(
             title=Text("Name your new board"),
             content=Column(
                 [TextField(label="New Board Name", on_submit=close_dlg)], tight=True),
             on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
-        page.dialog = dialog
+        self.page.dialog = dialog
         dialog.open = True
-        page.update()
+        self.page.update()
 
-    def navRail_change(e):
-        nonlocal currentBoardIndex
-        nonlocal currentBoard
-        currentBoardIndex = e.control.selected_index
-        if currentBoard in mainView.controls:
-            mainView.controls.remove(currentBoard)
-        currentBoard = boards[e.control.selected_index]
-        mainView.controls.append(currentBoard)
+    def navRail_change(self, e):
+        # nonlocal currentBoardIndex
+        # nonlocal currentBoard
+        self.currentBoardIndex = e.control.selected_index
+        if self.currentBoard.mainView in self.view.controls:
+            self.view.controls.remove(self.currentBoard.mainView)
+        self.currentBoard = self.boards[e.control.selected_index]
+        self.view.controls.append(self.currentBoard.mainView)
         print("Selected destination: ",
               e.control.selected_index)
-        page.update()
+        self.view.update()
         print("navRail_change called")
 
+
+def main(page: Page):
+    def search_app(e):
+        "TODO"
+    page.title = "Flet Trello clone"
+    page.bgcolor = colors.LIGHT_GREEN_400
     page.appbar = AppBar(
         leading=Icon(icons.GRID_GOLDENRATIO_ROUNDED),
         leading_width=100,
@@ -139,7 +198,7 @@ def main(page: Page):
                 content=Row(
                     [
                         TextField(hint_text="Search this board", border="none",
-                                  autofocus=False, on_submit=search_board, content_padding=padding.all(15), filled=False, suffix_icon=icons.SEARCH)
+                                  autofocus=False, on_submit=search_app, content_padding=padding.all(15), filled=False, suffix_icon=icons.SEARCH)
                     ],
                     alignment="spaceAround"
                 ),
@@ -162,38 +221,9 @@ def main(page: Page):
             )
         ],
     )
-
-    sidebar = NavigationRail(
-        destinations=boardNav,
-        bgcolor=colors.LIGHT_GREEN_700,
-        leading=Container(
-            content=Row(
-                controls=[
-                    TextButton("Add new board", icon=icons.ADD,
-                               on_click=addBoard),
-                    # Text("Add new board", text_align="center", weight="w500"),
-                    # IconButton(icon=icons.ADD, icon_size=20)
-                ]
-            ),
-            border_radius=border_radius.all(35),
-            bgcolor=colors.WHITE12,
-            padding=padding.all(0),
-            margin=margin.all(0)
-        ),
-        on_change=navRail_change,
-        selected_index=0,
-        extended=True
-    )
-
-    mainView = Row(
-        [
-            sidebar,
-            VerticalDivider(width=2),
-            currentBoard
-        ],
-        expand=True
-    )
-    page.add(mainView)
+    page.update()
+    app = TrelloApp(page)
+    page.add(app.view)
     # page.add(Text("Sanity Check"))
 
 
