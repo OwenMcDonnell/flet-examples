@@ -18,49 +18,32 @@ from flet import (
     margin
 )
 from board_list import BoardList
-# import pprint
-# pp = pprint.PrettyPrinter(indent=2, depth=10)
 
 
 class Board:
-
-    def __init__(self, page, app, identifier: str):
-        self.page = page
+    def __init__(self, app, identifier: str):
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
-        self.boardLists: list[BoardList] = [BoardList(self, "Empty List")]
-        self.mainView = self.buildMainView(self.switch.value)
-        # self.mainView = Column(
-        #     controls=[
-        #         Switch(label="Horizontal/Veritcal List View",
-        #                value=False, label_position="left"),
-        #         Row(
-        #             controls=[
-        #                 #THIS IS A BOARDLIST
-        #                 Container(
-        #                     content=Column([
-
-        #                         Checkbox(label="first item"),
-        #                         Checkbox(label="second item"),
-        #                         Checkbox(label="Third item")
-
-        #                     ], expand=True),
-        #                     border_radius=border_radius.all(15),
-        #                     bgcolor=colors.WHITE24,
-        #                     padding=padding.all(20),
-        #                     margin=margin.all(10),
-        #                 ),
-        #                 #THIS IS A BOARDLIST
-        #                 FloatingActionButton(
-        #                     icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg),
-        #             ],
-
-        #             # expand=True
-        #         )
-        #     ]
-        # )
+        self.boardLists: list[BoardList] = []
+        self.boardListsView = Row(
+            [
+                FloatingActionButton(
+                    icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
+            ],
+            vertical_alignment="start",
+            wrap=True,
+            # width=self.app.page.window_width
+        )
+        # self.mainView = self.buildMainView(self.switch.value)
+        self.mainView = Column(
+            controls=[
+                Switch(label="Horizontal/Veritcal List View",
+                       value=False, label_position="left"),
+                self.boardListsView
+            ]
+        )
 
     def toggle_view(self, e):
         self.mainView = self.buildMainView(self.switch.value)
@@ -97,7 +80,7 @@ class Board:
 
     def addList(self, list: BoardList):
         self.boardLists.append(list)
-        self.buildMainView(self.switch.value)
+        # self.buildMainView(self.switch.value)
         self.app.update()
 
     def addListDlg(self, e):
@@ -105,12 +88,15 @@ class Board:
             print("in close_dlg", e.control.value)
             print("self.boardLists before: ", self.boardLists)
             boardList = BoardList(self, e.control.value)
-            #print("boardList: ", boardList.view, boardList.view.content)
+            # print("boardList: ", boardList.view, boardList.view.content)
             self.boardLists.append(boardList)
+            self.boardListsView.controls.insert(
+                len(self.boardLists) - 1, boardList.view)
             print("self.boardLists after: ", self.boardLists)
             print("self.mainView.controls[1] before: ",
                   self.mainView.controls[1].controls)
-            self.mainView = self.buildMainView(self.switch.value)
+            self.mainView.update()
+            # self.mainView = self.buildMainView(self.switch.value)
             print("self.mainView.controls[1] after: ",
                   self.mainView.controls[1].controls)
             print("about to update")
@@ -118,6 +104,8 @@ class Board:
             # self.mainView.update()
             # self.addList(boardList)
             dialog.open = False
+
+            self.app.page.update()
 
         dialog = AlertDialog(
             title=Text("Name your new list"),
@@ -139,3 +127,19 @@ class Board:
 
     def createBoardNavDestination(self):
         pass
+
+    # BOARDLIST
+    #     Container(
+    #         content=Column([
+
+    #             Checkbox(label="first item"),
+    #             Checkbox(label="second item"),
+    #             Checkbox(label="Third item")
+
+    #         ], expand=True),
+    #         border_radius=border_radius.all(15),
+    #         bgcolor=colors.WHITE24,
+    #         padding=padding.all(20),
+    #         margin=margin.all(10),
+    #     ),
+    # BOARDLIST

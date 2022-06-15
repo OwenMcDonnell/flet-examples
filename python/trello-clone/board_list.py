@@ -25,11 +25,12 @@ class BoardList:
         ]
         #self.view = self.buildList()
         self.view = Container(
-            content=Column(controls=self.cardList, expand=True),
+            content=Column(controls=self.cardList),
             border_radius=border_radius.all(15),
             bgcolor=colors.WHITE24,
             padding=padding.all(20),
-            margin=margin.all(10),
+
+            # margin=margin.all(10),
         )
 
         # Column(controls=[FloatingActionButton(
