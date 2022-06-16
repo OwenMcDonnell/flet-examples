@@ -85,21 +85,17 @@ class Board:
 
     def addListDlg(self, e):
         def close_dlg(e):
-            print("in close_dlg", e.control.value)
-            print("self.boardLists before: ", self.boardLists)
             boardList = BoardList(self, e.control.value)
             # print("boardList: ", boardList.view, boardList.view.content)
             self.boardLists.append(boardList)
             self.boardListsView.controls.insert(
                 len(self.boardLists) - 1, boardList.view)
-            print("self.boardLists after: ", self.boardLists)
             print("self.mainView.controls[1] before: ",
                   self.mainView.controls[1].controls)
             self.mainView.update()
             # self.mainView = self.buildMainView(self.switch.value)
             print("self.mainView.controls[1] after: ",
                   self.mainView.controls[1].controls)
-            print("about to update")
             self.app.update()
             # self.mainView.update()
             # self.addList(boardList)
