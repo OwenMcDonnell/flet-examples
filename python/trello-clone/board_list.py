@@ -6,6 +6,8 @@ from flet import (
     Text,
     FloatingActionButton,
     Container,
+    TextButton,
+    TextField,
     Card,
     icons,
     border_radius,
@@ -19,27 +21,26 @@ class BoardList:
     def __init__(self, board, title: str):
         self.board = board
         self.title = title
-        self.cardList = [
-            Checkbox(label="first item"),
-            Checkbox(label="second item")
-        ]
+        self.cardInput = TextField(label="new card name", width=200)
+        self.cardList = Column([
+            self.cardInput,
+            TextButton("add card", icon=icons.ADD, on_click=self.addCard)
+        ])
         #self.view = self.buildList()
-        self.view = Container(
-            content=Column(controls=self.cardList),
-            border_radius=border_radius.all(15),
-            bgcolor=colors.WHITE24,
-            padding=padding.all(20),
+        self.view = Column([
+            Text(value=self.title, style="titleMedium"),
+            Container(
+                content=self.cardList,
+                border_radius=border_radius.all(15),
+                bgcolor=colors.WHITE24,
+                padding=padding.all(20),
+            )
+        ])
 
-            # margin=margin.all(10),
-        )
-
-        # Column(controls=[FloatingActionButton(
-        #     icon=icons.ADD, text="add card", on_click=self.addCard)])
-
-    def addCard(self, card):
-        self.cardList.append(Checkbox(label=card))
-        self.view = self.buildList()
-        self.board.update()
+    def addCard(self, e):
+        self.cardList.controls.append(Checkbox(label=self.cardInput.value))
+        self.cardInput.value = ""
+        self.view.update()
 
     def buildList(self):
         return Container(
@@ -49,18 +50,3 @@ class BoardList:
             padding=padding.all(20),
             margin=margin.all(10),
         )
-        # return Column(
-        # controls=[
-        # Column(controls=[FloatingActionButton(
-        #     icon=icons.ADD, text="add card", on_click=self.addCard)]),
-        # Container(
-        #     content=Column(
-        #         controls=self.cardList),
-        #     border_radius=border_radius.all(15),
-        #     bgcolor=colors.WHITE24,
-        #     padding=padding.all(20),
-        #     margin=margin.all(10),
-        # )
-        # ],
-        # expand=True
-        # )
