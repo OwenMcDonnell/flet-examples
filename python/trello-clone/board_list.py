@@ -19,7 +19,7 @@ from flet import (
 
 
 class BoardList:
-    def __init__(self, board, title: str):
+    def __init__(self, board, title: str, horizontal: bool = False):
         self.board = board
         self.title = title
         self.editField = Row([
@@ -44,10 +44,13 @@ class BoardList:
                 ),
             ],
         )
-        self.cardList = Column([
-            self.cardInput,
-            TextButton("add card", icon=icons.ADD, on_click=self.addCard)
-        ])
+        self.cardList = (
+            Column([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)]),
+            Row([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)])
+        )[horizontal]
+
         #self.view = self.buildList()
         self.view = Column([
             self.header,
@@ -83,7 +86,7 @@ class BoardList:
 
     def delete_list(self, e):
         self.board.boardLists.remove(self)
-        self.board.boardListsView.controls.remove(self)
+        self.board.boardListsView.controls.remove(self.view)
         self.board.mainView.update()
 
     def buildList(self):

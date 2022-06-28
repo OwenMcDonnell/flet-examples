@@ -39,15 +39,29 @@ class Board:
         # self.mainView = self.buildMainView(self.switch.value)
         self.mainView = Column(
             controls=[
-                Switch(label="Horizontal/Veritcal List View",
-                       value=False, label_position="left"),
+                # Switch(label="Horizontal/Veritcal List View",
+                #        value=False, label_position="left"),
+                self.switch,
                 self.boardListsView
             ]
         )
 
     def toggle_view(self, e):
-        self.mainView = self.buildMainView(self.switch.value)
+        if e.control.value:
+            for i in range(len(self.boardLists)):
+                # return True
+                boardList = BoardList(
+                    self, self.boardLists[i].title, e.control.value)
+                self.boardLists[i] = boardList
+                self.boardListsView.controls[i+1] = boardList.view
+            self.mainView = Row(
+                controls=[
+                    self.switch,
+                    self.boardListsView
+                ]
+            )
         self.app.update()
+        self.mainView.update()
 
     def buildMainView(self, horizontal: bool):
         ctrls = []
@@ -85,7 +99,7 @@ class Board:
 
     def addListDlg(self, e):
         def close_dlg(e):
-            boardList = BoardList(self, e.control.value)
+            boardList = BoardList(self, e.control.value, self.switch.value)
             # print("boardList: ", boardList.view, boardList.view.content)
             self.boardLists.append(boardList)
             self.boardListsView.controls.insert(
