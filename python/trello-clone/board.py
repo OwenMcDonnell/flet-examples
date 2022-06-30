@@ -26,8 +26,17 @@ class Board:
         self.identifier = identifier  # enforce uniqueness?
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
-        self.boardLists: list[BoardList] = []
-        self.boardListsView = Row(
+        self.boardListsHorizontal: list[BoardList] = []
+        self.boardListsVertical: list[BoardList] = []
+        self.boardListsVertical = Column(
+            [
+                FloatingActionButton(
+                    icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
+            ],
+            # vertical_alignment="start",
+            wrap=True,
+        )
+        self.boardListsHorizontal = Row(
             [
                 FloatingActionButton(
                     icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
@@ -37,31 +46,48 @@ class Board:
             # width=self.app.page.window_width
         )
         # self.mainView = self.buildMainView(self.switch.value)
-        self.mainView = Column(
+        self.mainViewHorizontal = Column(
             controls=[
-                # Switch(label="Horizontal/Veritcal List View",
-                #        value=False, label_position="left"),
                 self.switch,
-                self.boardListsView
-            ]
-        )
+                self.boardListsHorizontal
+            ])
+        self.mainViewVertical = Row(
+            controls=[
+                self.switch,
+                self.boardListsVertical
+            ], visible=False)
 
     def toggle_view(self, e):
+
         if e.control.value:
-            for i in range(len(self.boardLists)):
-                # return True
-                boardList = BoardList(
-                    self, self.boardLists[i].title, e.control.value)
-                self.boardLists[i] = boardList
-                self.boardListsView.controls[i+1] = boardList.view
-            self.mainView = Row(
-                controls=[
-                    self.switch,
-                    self.boardListsView
-                ]
-            )
+            print("go horizontal!")
+        #     self.boardListsView = Column(
+        #         [
+        #             FloatingActionButton(
+        #                 icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
+        #         ],
+        #         wrap=True,
+        #     )
+        #     for i in range(len(self.boardLists)):
+        #         # return True
+        #         boardList = BoardList(
+        #             self, self.boardLists[i].title, e.control.value)
+        #         print("boardlist cardlist", boardList.cardList)
+        #         self.boardLists[i] = boardList
+
+        #         self.boardListsView.controls.append(boardList.view)
+        #     self.mainView = Row(
+        #         controls=[
+        #             self.switch,
+        #             self.boardListsView
+        #         ]
+        #     )
+        # for i in range(len(self.boardLists)):
+        #     print("boardlist cardlist", self.boardLists[i].cardList)
+        self.mainViewHorizontal.visible = not e.control.value
+        self.mainViewVertical.visible = e.control.value
         self.app.update()
-        self.mainView.update()
+        # self.mainView.update()
 
     def buildMainView(self, horizontal: bool):
         ctrls = []
@@ -99,11 +125,15 @@ class Board:
 
     def addListDlg(self, e):
         def close_dlg(e):
-            boardList = BoardList(self, e.control.value, self.switch.value)
+            boardListHorizontal = BoardList(self, e.control.value, True)
+            boardListVertical = BoardList(self, e.control.value, False)
             # print("boardList: ", boardList.view, boardList.view.content)
-            self.boardLists.append(boardList)
-            self.boardListsView.controls.insert(
-                len(self.boardLists) - 1, boardList.view)
+            self.boardListsHorizontal.append(boardListHorizontal)
+            self.boardListsVertical.append(boardListVertical)
+            self.boardListsHorizontal.controls.insert(
+                len(self.boardListsHorizontal) - 1, boardListHorizontal.view)
+            self.boardListsVertical.controls.insert(
+                len(self.boardListsVertical) - 1, boardListVertical.view)
             print("self.mainView.controls[1] before: ",
                   self.mainView.controls[1].controls)
             self.mainView.update()
