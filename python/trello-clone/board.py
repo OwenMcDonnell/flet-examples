@@ -24,11 +24,12 @@ class Board:
     def __init__(self, app, identifier: str):
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
+        self.boardListsHash = {}
+        #self.boardListsHorizontal: list[BoardList] = []
+        #self.boardListsVertical: list[BoardList] = []
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
-        self.boardListsHorizontal: list[BoardList] = []
-        self.boardListsVertical: list[BoardList] = []
-        self.boardListHorizontal = Column(
+        self.boardListsHorizontal = Column(
             [
                 FloatingActionButton(
                     icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
@@ -37,7 +38,7 @@ class Board:
             wrap=True,
             visible=False
         )
-        self.boardListVertical = Row(
+        self.boardListsVertical = Row(
             [
                 FloatingActionButton(
                     icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
@@ -50,14 +51,18 @@ class Board:
         self.mainView = Column(
             controls=[
                 self.switch,
-                self.boardListHorizontal,
-                self.boardListVertical
+                self.boardListsHorizontal,
+                self.boardListsVertical
             ])
 
     def toggle_view(self, e):
+        # for each element in boardListsHash reverse visibility in tuple\
 
-        self.boardListHorizontal.visible = e.control.value
-        self.boardListVertical.visible = not e.control.value
+        self.boardListsHorizontal.visible = e.control.value
+        self.boardListsVertical.visible = not e.control.value
+        for l in self.boardListsHash.values():
+            l[0].visible = e.control.value
+            l[1].visible = not e.control.value
         self.app.update()
         # self.mainView.update()
 
@@ -67,16 +72,22 @@ class Board:
         self.app.update()
 
     def addListDlg(self, e):
+
         def close_dlg(e):
-            boardListHorizontal = BoardList(self, e.control.value, True)
-            boardListVertical = BoardList(self, e.control.value, False)
+            if (e.control.value in self.boardListsHash):
+                print("duplicate list")
+                return
+            newListHorizontal = BoardList(self, e.control.value, True)
+            newListVertical = BoardList(self, e.control.value, False)
             # print("boardList: ", boardList.view, boardList.view.content)
-            self.boardListsHorizontal.append(boardListHorizontal)
-            self.boardListsVertical.append(boardListVertical)
-            self.boardListHorizontal.controls.insert(
-                len(self.boardListsHorizontal) - 1, boardListHorizontal.view)
-            self.boardListVertical.controls.insert(
-                len(self.boardListsVertical) - 1, boardListVertical.view)
+            self.boardListsHash[e.control.value] = (
+                newListHorizontal, newListVertical)
+            # self.boardListsHorizontal.append(boardListHorizontal)
+            # self.boardListsVertical.append(boardListVertical)
+            self.boardListsHorizontal.controls.insert(
+                len(self.boardListsHash) - 1, newListHorizontal.view)
+            self.boardListsVertical.controls.insert(
+                len(self.boardListsHash) - 1, newListVertical.view)
             print("self.mainView.controls[1] before: ",
                   self.mainView.controls[1].controls)
             self.mainView.update()
