@@ -78,6 +78,8 @@ class Board:
             newListVertical = BoardList(self, e.control.value, False)
             self.boardListsHash[e.control.value] = (
                 newListHorizontal, newListVertical)
+            print("self.boardListsHash: ", self.boardListsHash)
+
             self.boardListsHorizontal.controls.insert(
                 len(self.boardListsHash) - 1, newListHorizontal.view)
             self.boardListsVertical.controls.insert(

@@ -26,6 +26,9 @@ class BoardList:
             TextField(label=self.title),
             TextButton(text="Save", on_click=self.save_title)
         ])
+        # should BoardList class or Board class fill the hash?
+        # self.horizontalListContainer = self.board.boardListsHash[self.title][0]
+        # self.verticalListContainer = self.board.boardListsHash[self.title]
         self.cardInput = TextField(label="new card name", width=200)
         self.header = Row(
             # spacing=0,
@@ -44,12 +47,13 @@ class BoardList:
                 ),
             ],
         )
-        self.board.boardListsHash[title] = (
-            Column([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=horizontal),
-            Row([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
-        )
+        # self.board.boardListsHash[title] = (
+        #     Column([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)], visible=horizontal),
+        #     Row([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
+        # )
+
         self.cardList = (
             Column([self.cardInput, TextButton(
                 "add card", icon=icons.ADD, on_click=self.addCard)]),
@@ -68,24 +72,35 @@ class BoardList:
 
     def addCard(self, e):
         self.board.boardListsHash[self.title][0].cardList.controls.append(
-            Checkbox(label=self.cardInput.value, on_change=self.card_checked)
+            Checkbox(label=self.cardInput.value, on_change=self.card_checked_H)
         )
         self.board.boardListsHash[self.title][1].cardList.controls.append(
-            Checkbox(label=self.cardInput.value, on_change=self.card_checked)
+            Checkbox(label=self.cardInput.value, on_change=self.card_checked_V)
         )
         self.cardInput.value = ""
         self.view.update()
 
-    def card_checked(self, e):
+    def card_checked_H(self, e):
+        print("card_checked event: ", e.control)
+        i = self.board.boardListsHash[self.title][0].cardList.controls.index(
+            e.control)
+        self.board.boardListsHash[self.title][1].cardList.controls[i].value = e.control.value
+        pass
+
+    def card_checked_V(self, e):
+        print("card_checked event: ", e.control)
+        i = self.board.boardListsHash[self.title][1].cardList.controls.index(
+            e.control)
+        self.board.boardListsHash[self.title][0].cardList.controls[i].value = e.control.value
         pass
 
     def edit_title(self, e):
-        #index = self.cardList.controls.index(e.control)
-        #print("clicked control index: ", index)
+        # index = self.cardList.controls.index(e.control)
+        # print("clicked control index: ", index)
         self.header.controls[0] = self.editField
         self.header.controls[1].visible = False
         self.header.controls[2].visible = False
-        #self.cardList[index] = self.editField
+        # self.cardList[index] = self.editField
         self.view.update()
 
     def save_title(self, e):
