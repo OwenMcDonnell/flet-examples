@@ -10,6 +10,8 @@ from flet import (
     AlertDialog,
     Container,
     Switch,
+    RadioGroup,
+    Radio,
     Page,
     icons,
     border_radius,
@@ -95,7 +97,7 @@ class Board:
         dialog = AlertDialog(
             title=Text("Name your new list"),
             content=Column(
-                [TextField(label="New List Name", on_submit=close_dlg)], tight=True),
+                [TextField(label="New List Name", on_submit=close_dlg)], RadioGroup(Row([Radio()])), tight=True),
             on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
         self.app.page.dialog = dialog
@@ -112,19 +114,3 @@ class Board:
 
     def createBoardNavDestination(self):
         pass
-
-    # BOARDLIST
-    #     Container(
-    #         content=Column([
-
-    #             Checkbox(label="first item"),
-    #             Checkbox(label="second item"),
-    #             Checkbox(label="Third item")
-
-    #         ], expand=True),
-    #         border_radius=border_radius.all(15),
-    #         bgcolor=colors.WHITE24,
-    #         padding=padding.all(20),
-    #         margin=margin.all(10),
-    #     ),
-    # BOARDLIST
