@@ -25,8 +25,7 @@ class Board:
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
         self.boardListsHash = {}
-        #self.boardListsHorizontal: list[BoardList] = []
-        #self.boardListsVertical: list[BoardList] = []
+
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
         self.boardListsHorizontal = Column(
@@ -47,7 +46,7 @@ class Board:
             wrap=True,
             # width=self.app.page.window_width
         )
-        # self.mainView = self.buildMainView(self.switch.value)
+
         self.mainView = Column(
             controls=[
                 self.switch,
@@ -56,8 +55,6 @@ class Board:
             ])
 
     def toggle_view(self, e):
-        # for each element in boardListsHash reverse visibility in tuple\
-
         self.boardListsHorizontal.visible = e.control.value
         self.boardListsVertical.visible = not e.control.value
         for l in self.boardListsHash.values():
@@ -79,24 +76,16 @@ class Board:
                 return
             newListHorizontal = BoardList(self, e.control.value, True)
             newListVertical = BoardList(self, e.control.value, False)
-            # print("boardList: ", boardList.view, boardList.view.content)
             self.boardListsHash[e.control.value] = (
                 newListHorizontal, newListVertical)
-            # self.boardListsHorizontal.append(boardListHorizontal)
-            # self.boardListsVertical.append(boardListVertical)
             self.boardListsHorizontal.controls.insert(
                 len(self.boardListsHash) - 1, newListHorizontal.view)
             self.boardListsVertical.controls.insert(
                 len(self.boardListsHash) - 1, newListVertical.view)
-            print("self.mainView.controls[1] before: ",
-                  self.mainView.controls[1].controls)
+
             self.mainView.update()
-            # self.mainView = self.buildMainView(self.switch.value)
-            print("self.mainView.controls[1] after: ",
-                  self.mainView.controls[1].controls)
+
             self.app.update()
-            # self.mainView.update()
-            # self.addList(boardList)
             dialog.open = False
 
             self.app.page.update()

@@ -50,18 +50,12 @@ class BoardList:
             Row([self.cardInput, TextButton(
                 "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
         )
-        # self.cardList = (
-        #     Column([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)]),
-        #     Row([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)])
-        # )[horizontal]
-        self.cardList = Column([
-            self.board.boardListsHash[title][0],
-            self.board.boardListsHash[title][1]
-        ])
-
-        #self.view = self.buildList()
+        self.cardList = (
+            Column([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)]),
+            Row([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)])
+        )[horizontal]
         self.view = Column([
             self.header,
             Container(
@@ -73,12 +67,17 @@ class BoardList:
         ])
 
     def addCard(self, e):
-        self.cardList.controls[0].controls.append(
-            Checkbox(label=self.cardInput.value))
-        self.cardList.controls[1].controls.append(
-            Checkbox(label=self.cardInput.value))
+        self.board.boardListsHash[self.title][0].cardList.controls.append(
+            Checkbox(label=self.cardInput.value, on_change=self.card_checked)
+        )
+        self.board.boardListsHash[self.title][1].cardList.controls.append(
+            Checkbox(label=self.cardInput.value, on_change=self.card_checked)
+        )
         self.cardInput.value = ""
         self.view.update()
+
+    def card_checked(self, e):
+        pass
 
     def edit_title(self, e):
         #index = self.cardList.controls.index(e.control)
