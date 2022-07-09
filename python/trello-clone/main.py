@@ -88,11 +88,12 @@ class TrelloApp:
                 VerticalDivider(width=2),
                 self.currentBoard.mainView
             ],
-            expand=True
+            expand=True,
         )
 
     def update(self):
         self.currentBoard = self.boards[self.currentBoardIndex]
+        self.page.update()
         self.view.update()
 
     def navRail_change(self, e):

@@ -19,7 +19,7 @@ from flet import (
 
 
 class BoardList:
-    def __init__(self, board, title: str, horizontal: bool = False):
+    def __init__(self, board, title: str, horizontal: bool = False, color: str = ""):
         self.board = board
         self.title = title
         self.editField = Row([
@@ -65,7 +65,7 @@ class BoardList:
             Container(
                 content=self.cardList,
                 border_radius=border_radius.all(15),
-                bgcolor=colors.WHITE24,
+                bgcolor=color,
                 padding=padding.all(20),
             )
         ])
