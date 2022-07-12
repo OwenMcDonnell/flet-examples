@@ -147,8 +147,28 @@ class Board:
         dialog.open = True
         self.app.page.update()
 
-    def removeList(self, list: BoardList):
-        self.boardList.remove(list)
+    def removeList(self, list: BoardList, e):
+        blTuple = self.boardListsHash.pop(list.title)
+        self.boardListsHorizontal.controls.remove(blTuple[0].view)
+        self.boardListsVertical.controls.remove(blTuple[1].view)
+        self.mainView.update()
+
+    def editListTitle(self, list: BoardList):
+        print("edit list title: ", list.header)
+        list.header.controls[0] = list.editField
+        list.header.controls[1].visible = False
+        list.header.controls[2].visible = False
+        list.view.update()
+
+    def saveListTitle(self, list: BoardList):
+        blTuple = self.boardListsHash[list.title]
+        list.title = list.editField.controls[0].value
+        list.header.controls[0] = Text(value=list.title, style="titleMedium")
+        list.header.controls[1].visible = True
+        list.header.controls[2].visible = True
+        for bl in blTuple:
+            bl.title = list.title
+        list.view.update()
 
     def moveBoard(self, list: BoardList, displacement: int):
         i = self.boardList.index(list)

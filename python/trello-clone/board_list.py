@@ -26,9 +26,6 @@ class BoardList:
             TextField(label=self.title),
             TextButton(text="Save", on_click=self.save_title)
         ])
-        # should BoardList class or Board class fill the hash?
-        # self.horizontalListContainer = self.board.boardListsHash[self.title][0]
-        # self.verticalListContainer = self.board.boardListsHash[self.title]
         self.cardInput = TextField(label="new card name", width=200)
         self.header = Row(
             # spacing=0,
@@ -47,13 +44,6 @@ class BoardList:
                 ),
             ],
         )
-        # self.board.boardListsHash[title] = (
-        #     Column([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)], visible=horizontal),
-        #     Row([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
-        # )
-
         self.cardList = (
             Column([self.cardInput, TextButton(
                 "add card", icon=icons.ADD, on_click=self.addCard)]),
@@ -65,8 +55,8 @@ class BoardList:
             Container(
                 content=self.cardList,
                 border_radius=border_radius.all(15),
-                bgcolor=color,
-                padding=padding.all(20),
+                bgcolor=color if (color != "") else colors.BACKGROUND,
+                padding=padding.all(20)
             )
         ])
 
@@ -95,26 +85,28 @@ class BoardList:
         pass
 
     def edit_title(self, e):
-        # index = self.cardList.controls.index(e.control)
-        # print("clicked control index: ", index)
-        self.header.controls[0] = self.editField
-        self.header.controls[1].visible = False
-        self.header.controls[2].visible = False
-        # self.cardList[index] = self.editField
-        self.view.update()
+
+        # self.header.controls[0] = self.editField
+        # self.header.controls[1].visible = False
+        # self.header.controls[2].visible = False
+
+        # self.view.update()
+        self.board.editListTitle(self)
 
     def save_title(self, e):
-        self.title = self.editField.controls[0].value
-        self.header.controls[0] = Text(
-            value=self.title, style="titleMedium")
-        self.header.controls[1].visible = True
-        self.header.controls[2].visible = True
-        self.view.update()
+        # self.title = self.editField.controls[0].value
+        # self.header.controls[0] = Text(
+        #     value=self.title, style="titleMedium")
+        # self.header.controls[1].visible = True
+        # self.header.controls[2].visible = True
+        # self.view.update()
+        self.board.saveListTitle(self)
 
     def delete_list(self, e):
-        self.board.boardLists.remove(self)
-        self.board.boardListsView.controls.remove(self.view)
-        self.board.mainView.update()
+        self.board.removeList(self)
+        # self.board.boardLists.remove(self)
+        # self.board.boardListsView.controls.remove(self.view)
+        # self.board.mainView.update()
 
     def buildList(self):
         return Container(

@@ -42,13 +42,13 @@ from flet import (
 # trello app
 # MVP  - Boards -> Lists -> Cards
 # Views - Different views of boards (timeline, table, etc.)
+# Boards contain a hash of board_lists (kept as horizontal/vertical tuples), therefore manage those lists (addition, deletion, editing, etc.)
+# BoardLists contain Lists of cards, therefore manage those cards (addition, deletion, checked state etc.)
 
 
 class TrelloApp:
     def __init__(self, page: Page):
         self.page = page
-        self.cardLists = []
-        self.cardList = {}
         self.sidebar = NavigationRail(
             destinations=[
                 NavigationRailDestination(
