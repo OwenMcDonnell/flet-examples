@@ -80,8 +80,9 @@ class Board:
             colors.RED_200: self.colorOptionCreator(colors.RED_200, "red"),
             colors.LIGHT_GREEN: self.colorOptionCreator(colors.LIGHT_GREEN, "green"),
             colors.LIGHT_BLUE: self.colorOptionCreator(colors.LIGHT_BLUE, "blue"),
-            colors.ORANGE_300: self.colorOptionCreator(
-                colors.ORANGE_300, "orange")
+            colors.ORANGE_300: self.colorOptionCreator(colors.ORANGE_300, "orange"),
+            colors.PINK_300: self.colorOptionCreator(colors.PINK_300, "pink"),
+            colors.YELLOW_400: self.colorOptionCreator(colors.YELLOW_400, "yellow"),
         }
 
         def set_color(e):
@@ -125,10 +126,14 @@ class Board:
                 newListHorizontal, newListVertical)
             print("self.boardListsHash: ", self.boardListsHash)
 
+            # self.boardListsHorizontal.controls.insert(
+            #     len(self.boardListsHash) - 1, newListHorizontal.view)
+            # self.boardListsVertical.controls.insert(
+            #     len(self.boardListsHash) - 1, newListVertical.view)
             self.boardListsHorizontal.controls.insert(
-                len(self.boardListsHash) - 1, newListHorizontal.view)
+                len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][0].view)
             self.boardListsVertical.controls.insert(
-                len(self.boardListsHash) - 1, newListVertical.view)
+                len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][1].view)
 
             self.mainView.update()
 
@@ -161,13 +166,20 @@ class Board:
         list.view.update()
 
     def saveListTitle(self, list: BoardList):
-        blTuple = self.boardListsHash[list.title]
+        oldTitle = list.title
+        print("oldTitle: ", oldTitle)
         list.title = list.editField.controls[0].value
+        print("new editField title: ",
+              list.editField.controls[0].value, list.title)
         list.header.controls[0] = Text(value=list.title, style="titleMedium")
         list.header.controls[1].visible = True
         list.header.controls[2].visible = True
-        for bl in blTuple:
-            bl.title = list.title
+        self.boardListsHash[oldTitle][0].title = list.title
+        self.boardListsHash[oldTitle][1].title = list.title
+        self.boardListsHash[list.title] = self.boardListsHash[oldTitle]
+        del self.boardListsHash[oldTitle]
+        # for bl in blTuple:
+        #     bl.title = list.title
         list.view.update()
 
     def moveBoard(self, list: BoardList, displacement: int):
@@ -195,8 +207,8 @@ class Board:
                 alignment="center",
                 horizontal_alignment="center",
             ),
-            padding=padding.all(20),
-            margin=margin.all(10),
+            padding=padding.all(10),
+            margin=margin.all(1),
             alignment=alignment.center,
         )
 

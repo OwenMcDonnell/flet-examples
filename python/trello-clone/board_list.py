@@ -103,7 +103,7 @@ class BoardList:
         self.board.saveListTitle(self)
 
     def delete_list(self, e):
-        self.board.removeList(self)
+        self.board.removeList(self, e)
         # self.board.boardLists.remove(self)
         # self.board.boardListsView.controls.remove(self.view)
         # self.board.mainView.update()
