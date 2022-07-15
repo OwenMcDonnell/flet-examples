@@ -21,6 +21,7 @@ from flet import (
 class BoardList:
     def __init__(self, board, title: str, horizontal: bool = False, color: str = ""):
         self.board = board
+        self.horizontal = horizontal
         self.title = title
         self.editField = Row([
             TextField(label=self.title),
@@ -58,7 +59,7 @@ class BoardList:
                 bgcolor=color if (color != "") else colors.BACKGROUND,
                 padding=padding.all(20)
             )
-        ])
+        ], data=self.title)
 
     def addCard(self, e):
         self.board.boardListsHash[self.title][0].cardList.controls.append(

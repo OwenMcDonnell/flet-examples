@@ -31,7 +31,7 @@ class Board:
     def __init__(self, app, identifier: str):
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
-        self.boardListsHash = {}
+        #self.boardListsHash = {}
 
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
@@ -63,9 +63,9 @@ class Board:
     def toggle_view(self, e):
         self.boardListsHorizontal.visible = e.control.value
         self.boardListsVertical.visible = not e.control.value
-        for l in self.boardListsHash.values():
-            l[0].visible = e.control.value
-            l[1].visible = not e.control.value
+        # for l in self.boardListsHash.values():
+        #     l[0].visible = e.control.value
+        #     l[1].visible = not e.control.value
         self.app.update()
         # self.mainView.update()
 
@@ -89,7 +89,6 @@ class Board:
             chosenColor = e.control.data
             colorOptions.data = chosenColor
             print("colorOptions.data: ", colorOptions.data)
-            #colorDisplay.value = f"Your chosen color: {colorOptions.data}"
             for k, v in optionDict.items():
                 if k == e.control.data:
                     v.bgcolor = colors.BLACK12
@@ -97,7 +96,6 @@ class Board:
                     v.border_radius = border_radius.all(100)
                 else:
                     v.bgcolor = None
-            #optionDict[e.control.data].border = border.all(1, colors.BLACK26)
             dialog.content.update()
             # colorOptions.update()
             # self.app.update()
@@ -115,25 +113,25 @@ class Board:
             )
 
         def close_dlg(e):
-            if (e.control.value in self.boardListsHash):
-                print("duplicate list")
-                return
+            # if (e.control.value in self.boardListsHash):
+            #     print("duplicate list")
+            #     return
             newListHorizontal = BoardList(
                 self, e.control.value, True, colorOptions.data)
             newListVertical = BoardList(
                 self, e.control.value, False, colorOptions.data)
-            self.boardListsHash[e.control.value] = (
-                newListHorizontal, newListVertical)
-            print("self.boardListsHash: ", self.boardListsHash)
+            # self.boardListsHash[e.control.value] = (
+            #     newListHorizontal, newListVertical)
+            #print("self.boardListsHash: ", self.boardListsHash)
 
-            # self.boardListsHorizontal.controls.insert(
-            #     len(self.boardListsHash) - 1, newListHorizontal.view)
-            # self.boardListsVertical.controls.insert(
-            #     len(self.boardListsHash) - 1, newListVertical.view)
             self.boardListsHorizontal.controls.insert(
-                len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][0].view)
+                len(self.boardListsHorizontal.controls) - 1, newListHorizontal.view)
             self.boardListsVertical.controls.insert(
-                len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][1].view)
+                len(self.boardListsVertical.controls) - 1, newListVertical.view)
+            # self.boardListsHorizontal.controls.insert(
+            #     len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][0].view)
+            # self.boardListsVertical.controls.insert(
+            #     len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][1].view)
 
             self.mainView.update()
 
@@ -153,9 +151,17 @@ class Board:
         self.app.page.update()
 
     def removeList(self, list: BoardList, e):
-        blTuple = self.boardListsHash.pop(list.title)
-        self.boardListsHorizontal.controls.remove(blTuple[0].view)
-        self.boardListsVertical.controls.remove(blTuple[1].view)
+        #blTuple = self.boardListsHash.pop(list.title)
+        # self.boardListsHorizontal.controls = [
+        #     i for i in self.boardListsHorizontal.controls[1:] if i.data != list.title]
+        # self.boardListsVertical.controls = [
+        #     i for i in self.boardListsVertical.controls[1:] if i.data != list.title]
+        if list.horizontal:
+            index = self.boardListsHorizontal.controls.index(list.view)
+        else:
+            index = self.boardListsVertical.controls.index(list.view)
+        del self.boardListsHorizontal.controls[index]
+        del self.boardListsVertical.controls[index]
         self.mainView.update()
 
     def editListTitle(self, list: BoardList):
@@ -174,10 +180,10 @@ class Board:
         list.header.controls[0] = Text(value=list.title, style="titleMedium")
         list.header.controls[1].visible = True
         list.header.controls[2].visible = True
-        self.boardListsHash[oldTitle][0].title = list.title
-        self.boardListsHash[oldTitle][1].title = list.title
-        self.boardListsHash[list.title] = self.boardListsHash[oldTitle]
-        del self.boardListsHash[oldTitle]
+        # self.boardListsHash[oldTitle][0].title = list.title
+        # self.boardListsHash[oldTitle][1].title = list.title
+        # self.boardListsHash[list.title] = self.boardListsHash[oldTitle]
+        # del self.boardListsHash[oldTitle]
         # for bl in blTuple:
         #     bl.title = list.title
         list.view.update()
@@ -214,96 +220,3 @@ class Board:
 
     def createBoardNavDestination(self):
         pass
-
-
-# colorOptions = Row(controls=[
-#             TextButton(
-#                 content=Container(
-#                     content=Column(
-#                         [
-#                             Icon(name=icons.CIRCLE, color=colors.AMBER),
-#                             Text(
-#                                 value="Amber",
-#                                 # size=12,
-#                                 width=50,
-#                                 no_wrap=True,
-#                                 text_align="center",
-
-#                                 # color=colors.ON_SURFACE_VARIANT,
-#                             ),
-#                         ],
-#                         # spacing=5,
-#                         alignment="center",
-#                         horizontal_alignment="center",
-#                     ),
-#                     bgcolor=colors.ON_BACKGROUND if (
-#                         colorDisplay.value == "Amber") else colors.BACKGROUND,
-#                     padding=padding.all(10),
-#                     alignment=alignment.center,
-#                 ),
-
-#                 on_click=set_color,
-#                 data="Amber"
-#             ),
-#             TextButton(
-#                 content=Container(
-#                     content=Column(
-#                         [
-#                             Icon(name=icons.CIRCLE, color=colors.TEAL),
-#                             # Container(
-#                             #     content=Checkbox(),
-#                             #     padding=-10,
-#                             #     border=border.all(7, colors.BLACK),
-#                             #     border_radius=border_radius.all(100)
-#                             # )
-#                             Text(
-#                                 value="Teal",
-#                                 # size=12,
-#                                 width=50,
-#                                 no_wrap=True,
-#                                 text_align="center",
-#                                 # color=colors.ON_SURFACE_VARIANT,
-#                             ),
-#                         ],
-#                         # spacing=5,
-#                         alignment="center",
-#                         horizontal_alignment="center",
-#                     ),
-#                     bgcolor=colors.ON_BACKGROUND if (
-#                         colorDisplay.value == "Teal") else colors.BACKGROUND,
-#                     padding=padding.all(10),
-#                     alignment=alignment.center,
-#                 ),
-
-#                 on_click=set_color,
-#                 data="Teal"
-#             ),
-#             TextButton(
-#                 content=Container(
-#                     content=Column(
-#                         [
-#                             Icon(name=icons.CIRCLE, color=colors.INDIGO),
-#                             Text(
-#                                 value="Indigo",
-#                                 # size=12,
-#                                 width=50,
-#                                 no_wrap=True,
-#                                 text_align="center",
-#                                 # color=colors.ON_SURFACE_VARIANT,
-#                             ),
-#                         ],
-#                         # spacing=5,
-#                         alignment="center",
-#                         horizontal_alignment="center",
-#                     ),
-#                     bgcolor=colors.ON_BACKGROUND if (
-#                         colorDisplay.value == "Indigo") else colors.BACKGROUND,
-#                     padding=padding.all(10),
-#                     alignment=alignment.center,
-#                 ),
-
-#                 on_click=set_color,
-#                 data="Indigo"
-#             )
-
-#         ], data="")
