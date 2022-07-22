@@ -35,20 +35,18 @@ class Board:
 
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
-        self.boardListsHorizontal = Column(
-            [
-                FloatingActionButton(
-                    icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
-            ],
+        self.boardLists = [
+            FloatingActionButton(
+                icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
+        ]
+        self.horizontalWrap = Column(
+            self.boardLists,
             # vertical_alignment="start",
             wrap=True,
             visible=False
         )
-        self.boardListsVertical = Row(
-            [
-                FloatingActionButton(
-                    icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
-            ],
+        self.verticalWrap = Row(
+            self.boardLists,
             vertical_alignment="start",
             wrap=True,
             # width=self.app.page.window_width
@@ -56,9 +54,11 @@ class Board:
         self.mainView = Column(
             controls=[
                 self.switch,
-                self.boardListsHorizontal,
-                self.boardListsVertical
+                self.horizontalWrap,
+                self.verticalWrap
             ])
+    # this method should ask the BoardLists to change view
+    # for each list in BoardLists list.horizontalView.visible = false, list.verticalView.visible = true
 
     def toggle_view(self, e):
         self.boardListsHorizontal.visible = e.control.value
@@ -116,18 +116,22 @@ class Board:
             # if (e.control.value in self.boardListsHash):
             #     print("duplicate list")
             #     return
-            newListHorizontal = BoardList(
-                self, e.control.value, True, colorOptions.data)
-            newListVertical = BoardList(
-                self, e.control.value, False, colorOptions.data)
+            # newListHorizontal = BoardList(
+            #     self, e.control.value, True, colorOptions.data)
+            # newListVertical = BoardList(
+            #     self, e.control.value, False, colorOptions.data)
+            print("self.switch.value: ", self.switch.value,
+                  type(self.switch.value))
+            newList = BoardList(self, e.control.value,
+                                self.switch.value, colorOptions.data)
             # self.boardListsHash[e.control.value] = (
             #     newListHorizontal, newListVertical)
             #print("self.boardListsHash: ", self.boardListsHash)
-
-            self.boardListsHorizontal.controls.insert(
-                len(self.boardListsHorizontal.controls) - 1, newListHorizontal.view)
-            self.boardListsVertical.controls.insert(
-                len(self.boardListsVertical.controls) - 1, newListVertical.view)
+            self.boardLists.insert(0, newList.view)
+            # self.boardListsHorizontal.controls.insert(
+            #     len(self.boardListsHorizontal.controls) - 1, newListHorizontal.view)
+            # self.boardListsVertical.controls.insert(
+            #     len(self.boardListsVertical.controls) - 1, newListVertical.view)
             # self.boardListsHorizontal.controls.insert(
             #     len(self.boardListsHash) - 1, self.boardListsHash[e.control.value][0].view)
             # self.boardListsVertical.controls.insert(
@@ -169,6 +173,7 @@ class Board:
         list.header.controls[0] = list.editField
         list.header.controls[1].visible = False
         list.header.controls[2].visible = False
+
         list.view.update()
 
     def saveListTitle(self, list: BoardList):

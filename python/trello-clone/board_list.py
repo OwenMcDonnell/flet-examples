@@ -45,19 +45,33 @@ class BoardList:
                 ),
             ],
         )
-        self.cardList = (
-            Column([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)]),
-            Row([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)])
-        )[horizontal]
+        # self.cardList = (
+        #     Column([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)]),
+        #     Row([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)])
+        # )[horizontal]
+        self.hrztlCardList = Row([self.cardInput, TextButton(
+            "add card", icon=icons.ADD, on_click=self.addCard)], visible=horizontal)
+
+        self.vrtclCardList = Column([self.cardInput, TextButton(
+            "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
+
         self.view = Column([
             self.header,
             Container(
-                content=self.cardList,
+                content=self.hrztlCardList,
                 border_radius=border_radius.all(15),
                 bgcolor=color if (color != "") else colors.BACKGROUND,
-                padding=padding.all(20)
+                padding=padding.all(20),
+                visible=horizontal
+            ),
+            Container(
+                content=self.vrtclCardList,
+                border_radius=border_radius.all(15),
+                bgcolor=color if (color != "") else colors.BACKGROUND,
+                padding=padding.all(20),
+                visible=(not horizontal)
             )
         ], data=self.title)
 
