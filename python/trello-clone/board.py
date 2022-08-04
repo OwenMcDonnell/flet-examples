@@ -31,7 +31,7 @@ class Board:
     def __init__(self, app, identifier: str):
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
-        #self.boardListsHash = {}
+        self.boardListsHash = {}
 
         self.switch = Switch(
             label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
@@ -43,12 +43,13 @@ class Board:
             self.boardLists,
             # vertical_alignment="start",
             wrap=True,
-            visible=False
+            visible=True
         )
         self.verticalWrap = Row(
             self.boardLists,
             vertical_alignment="start",
             wrap=True,
+            visible=False
             # width=self.app.page.window_width
         )
         self.mainView = Column(
@@ -57,17 +58,28 @@ class Board:
                 self.horizontalWrap,
                 self.verticalWrap
             ])
+
     # this method should ask the BoardLists to change view
     # for each list in BoardLists list.horizontalView.visible = false, list.verticalView.visible = true
-
     def toggle_view(self, e):
-        self.boardListsHorizontal.visible = e.control.value
-        self.boardListsVertical.visible = not e.control.value
+        for k, v in self.boardListsHash.items():
+            print("horizontal value from hash before: ", v.horizontal)
+            v.horizontal = (not v.horizontal)
+            print("horizontal value from hash after: ", v.horizontal)
+            v.toggleView()
+        # for l in self.boardLists[:-1]:
+        #     print("l in self.boardLists: ",
+        #           l)
+        #     l.controls[1].visible = not l.controls[1].visible
+        #     l.controls[2].visible = not l.controls[2].visible
+        #     l.update()
+        self.horizontalWrap.visible = e.control.value
+        self.verticalWrap.visible = not e.control.value
         # for l in self.boardListsHash.values():
         #     l[0].visible = e.control.value
         #     l[1].visible = not e.control.value
         self.app.update()
-        # self.mainView.update()
+        self.mainView.update()
 
     def addList(self, list: BoardList):
         self.boardLists.append(list)
@@ -123,11 +135,13 @@ class Board:
             print("self.switch.value: ", self.switch.value,
                   type(self.switch.value))
             newList = BoardList(self, e.control.value,
-                                self.switch.value, colorOptions.data)
+                                color=colorOptions.data)
+
+            self.boardListsHash[e.control.value] = newList
             # self.boardListsHash[e.control.value] = (
             #     newListHorizontal, newListVertical)
             #print("self.boardListsHash: ", self.boardListsHash)
-            self.boardLists.insert(0, newList.view)
+            self.boardLists.insert(-1, newList.view)
             # self.boardListsHorizontal.controls.insert(
             #     len(self.boardListsHorizontal.controls) - 1, newListHorizontal.view)
             # self.boardListsVertical.controls.insert(

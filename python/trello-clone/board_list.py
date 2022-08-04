@@ -52,36 +52,60 @@ class BoardList:
         #         "add card", icon=icons.ADD, on_click=self.addCard)])
         # )[horizontal]
         self.hrztlCardList = Row([self.cardInput, TextButton(
-            "add card", icon=icons.ADD, on_click=self.addCard)], visible=horizontal)
+            "add card", icon=icons.ADD, on_click=self.addCard)])
 
         self.vrtclCardList = Column([self.cardInput, TextButton(
-            "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
+            "add card", icon=icons.ADD, on_click=self.addCard)])
 
         self.view = Column([
             self.header,
             Container(
-                content=self.hrztlCardList,
-                border_radius=border_radius.all(15),
+                content=self.hrztlCardList if self.horizontal else self.vrtclCardList,
+                # border_radius=border_radius.all(15),
                 bgcolor=color if (color != "") else colors.BACKGROUND,
                 padding=padding.all(20),
-                visible=horizontal
+                #visible=(not self.horizontal)
             ),
-            Container(
-                content=self.vrtclCardList,
-                border_radius=border_radius.all(15),
-                bgcolor=color if (color != "") else colors.BACKGROUND,
-                padding=padding.all(20),
-                visible=(not horizontal)
-            )
+            # Container(
+            #     content=self.vrtclCardList,
+            #     border_radius=border_radius.all(15),
+            #     bgcolor=color if (color != "") else colors.BACKGROUND,
+            #     padding=padding.all(20),
+            #     visible=(not self.horizontal)
+            # )
         ], data=self.title)
 
+    # @horizontal.setter
+    # def horizontal(self, val):
+    #     self.horizontal = val
+    def toggleView(self):
+        print("containter content before: ", self.view.controls[1].content)
+        self.view.controls[1].content = self.hrztlCardList if (
+            not self.horizontal) else self.vrtclCardList
+        self.view.update()
+        print("containter content after: ", self.view.controls[1].content)
+
     def addCard(self, e):
-        self.board.boardListsHash[self.title][0].cardList.controls.append(
-            Checkbox(label=self.cardInput.value, on_change=self.card_checked_H)
+        self.hrztlCardList.controls.insert(
+            -1,
+            Checkbox(
+                label=self.cardInput.value, on_change=self.card_checked_H)
         )
-        self.board.boardListsHash[self.title][1].cardList.controls.append(
-            Checkbox(label=self.cardInput.value, on_change=self.card_checked_V)
+
+        self.vrtclCardList.controls.insert(
+            -1,
+            Checkbox(
+                label=self.cardInput.value, on_change=self.card_checked_V)
         )
+        print("self.hrztlCardList: ", self.hrztlCardList.controls)
+        print("self.vrtclCardList: ", self.vrtclCardList.controls)
+        # self.board.boardListsHash[self.title][0].cardList.controls.append(
+        #     Checkbox(label=self.cardInput.value, on_change=self.card_checked_H)
+        # )
+        # self.board.boardListsHash[self.title][1].cardList.controls.append(
+        #     Checkbox(label=self.cardInput.value, on_change=self.card_checked_V)
+        # )
+
         self.cardInput.value = ""
         self.view.update()
 
