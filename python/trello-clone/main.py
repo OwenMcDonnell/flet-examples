@@ -38,9 +38,9 @@ from flet import (
     margin,
     border
 )
-from dotenv import dotenv_values
+#from dotenv import dotenv_values
 
-config = dotenv_values(".env.dev")
+#config = dotenv_values(".env.dev")
 
 # trello app
 # MVP  - Boards -> Lists -> Cards

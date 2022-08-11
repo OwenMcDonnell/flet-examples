@@ -43,13 +43,13 @@ class Board:
             self.boardLists,
             # vertical_alignment="start",
             wrap=True,
-            visible=True
+            visible=self.switch.value
         )
         self.verticalWrap = Row(
             self.boardLists,
             vertical_alignment="start",
             wrap=True,
-            visible=False
+            visible=(not self.switch.value)
             # width=self.app.page.window_width
         )
         self.mainView = Column(
@@ -62,24 +62,34 @@ class Board:
     # this method should ask the BoardLists to change view
     # for each list in BoardLists list.horizontalView.visible = false, list.verticalView.visible = true
     def toggle_view(self, e):
+        print("self.switch.value from change handler: ", self.switch.value)
+
+        # false means horizontal.
+        index = 0
         for k, v in self.boardListsHash.items():
+
             print("horizontal value from hash before: ", v.horizontal)
-            v.horizontal = (not v.horizontal)
-            print("horizontal value from hash after: ", v.horizontal)
+            #v.horizontal = (not v.horizontal)
             v.toggleView()
+            self.boardLists[index] = v.view
+            index += 1
+            print("horizontal value from hash after: ", v.horizontal)
+
         # for l in self.boardLists[:-1]:
         #     print("l in self.boardLists: ",
         #           l)
         #     l.controls[1].visible = not l.controls[1].visible
         #     l.controls[2].visible = not l.controls[2].visible
         #     l.update()
-        self.horizontalWrap.visible = e.control.value
-        self.verticalWrap.visible = not e.control.value
+
+        self.horizontalWrap.visible = self.switch.value
+        self.verticalWrap.visible = (not self.switch.value)
+
         # for l in self.boardListsHash.values():
         #     l[0].visible = e.control.value
         #     l[1].visible = not e.control.value
         self.app.update()
-        self.mainView.update()
+        # self.mainView.update()
 
     def addList(self, list: BoardList):
         self.boardLists.append(list)
@@ -134,7 +144,7 @@ class Board:
             #     self, e.control.value, False, colorOptions.data)
             print("self.switch.value: ", self.switch.value,
                   type(self.switch.value))
-            newList = BoardList(self, e.control.value,
+            newList = BoardList(self, e.control.value, self.switch.value,
                                 color=colorOptions.data)
 
             self.boardListsHash[e.control.value] = newList

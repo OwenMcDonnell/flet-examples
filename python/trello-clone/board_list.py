@@ -19,10 +19,11 @@ from flet import (
 
 
 class BoardList:
-    def __init__(self, board, title: str, horizontal: bool = False, color: str = ""):
+    def __init__(self, board, title: str, horizontal: bool, color: str = ""):
         self.board = board
         self.horizontal = horizontal
         self.title = title
+        self.color = color
         self.editField = Row([
             TextField(label=self.title),
             TextButton(text="Save", on_click=self.save_title)
@@ -62,7 +63,8 @@ class BoardList:
             Container(
                 content=self.hrztlCardList if self.horizontal else self.vrtclCardList,
                 # border_radius=border_radius.all(15),
-                bgcolor=color if (color != "") else colors.BACKGROUND,
+                bgcolor=self.color if (
+                    self.color != "") else colors.BACKGROUND,
                 padding=padding.all(20),
                 #visible=(not self.horizontal)
             ),
@@ -79,9 +81,18 @@ class BoardList:
     # def horizontal(self, val):
     #     self.horizontal = val
     def toggleView(self):
+        self.horizontal = (not self.horizontal)
         print("containter content before: ", self.view.controls[1].content)
-        self.view.controls[1].content = self.hrztlCardList if (
-            not self.horizontal) else self.vrtclCardList
+        self.view.controls[1].content = self.hrztlCardList if self.horizontal else self.vrtclCardList
+        # self.view.controls[1] = Container(
+        #     content=self.hrztlCardList if self.horizontal else self.vrtclCardList,
+        #     # border_radius=border_radius.all(15),
+        #     bgcolor=self.color if (
+        #         self.color != "") else colors.BACKGROUND,
+        #     padding=padding.all(20),
+        #     #visible=(not self.horizontal)
+        # )
+
         self.view.update()
         print("containter content after: ", self.view.controls[1].content)
 
