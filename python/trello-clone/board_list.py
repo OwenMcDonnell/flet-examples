@@ -1,3 +1,4 @@
+
 from flet import (
     Column,
     Row,
@@ -30,7 +31,7 @@ class BoardList:
         ])
         self.cardInput = TextField(label="new card name", width=200)
         self.header = Row(
-            # spacing=0,
+
             alignment="spaceBetween",
             controls=[
                 Text(value=self.title, style="titleMedium"),
@@ -46,46 +47,64 @@ class BoardList:
                 ),
             ],
         )
-        # self.cardList = (
-        #     Column([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)]),
-        #     Row([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)])
-        # )[horizontal]
+
         self.hrztlCardList = Row([self.cardInput, TextButton(
             "add card", icon=icons.ADD, on_click=self.addCard)])
 
         self.vrtclCardList = Column([self.cardInput, TextButton(
             "add card", icon=icons.ADD, on_click=self.addCard)])
+        self.list = Column([
+            Row([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not self.horizontal)),
+            Column([self.cardInput, TextButton(
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(self.horizontal))
+
+        ])
 
         self.view = Column([
             self.header,
             Container(
-                content=self.hrztlCardList if self.horizontal else self.vrtclCardList,
+                content=self.list,
                 # border_radius=border_radius.all(15),
                 bgcolor=self.color if (
                     self.color != "") else colors.BACKGROUND,
                 padding=padding.all(20),
-                #visible=(not self.horizontal)
+                # visible=self.horizontal
             ),
             # Container(
             #     content=self.vrtclCardList,
-            #     border_radius=border_radius.all(15),
-            #     bgcolor=color if (color != "") else colors.BACKGROUND,
+            #     # border_radius=border_radius.all(15),
+            #     bgcolor=self.color if (
+            #         self.color != "") else colors.BACKGROUND,
             #     padding=padding.all(20),
             #     visible=(not self.horizontal)
             # )
+
         ], data=self.title)
 
-    # @horizontal.setter
-    # def horizontal(self, val):
-    #     self.horizontal = val
     def toggleView(self):
-        self.horizontal = (not self.horizontal)
-        print("containter content before: ", self.view.controls[1].content)
-        self.view.controls[1].content = self.hrztlCardList if self.horizontal else self.vrtclCardList
+        #self.horizontal = switch
+        # print("containter content before: ", self.view.controls[1].content)
+        # print("switch value: ", switch, self.horizontal)
+        # newControl: any
+        # if self.horizontal:
+        #     newControl = Column([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)])
+
+        # else:
+        #     newControl = Row([self.cardInput, TextButton(
+        #         "add card", icon=icons.ADD, on_click=self.addCard)])
+
+        # self.view.controls[1].content = self.vrtclCardList if switch else self.hrztlCardList
+        # self.view.controls[1].content.controls visible = (switch)
+        self.list.controls[0].visible = (not self.horizontal)
+        self.list.controls[1].visible = (self.horizontal)
+
+        self.view.update()
+        # self.view.controls[1].content = self.list
+        # self.view.update()
         # self.view.controls[1] = Container(
-        #     content=self.hrztlCardList if self.horizontal else self.vrtclCardList,
+        #     content=self.list,
         #     # border_radius=border_radius.all(15),
         #     bgcolor=self.color if (
         #         self.color != "") else colors.BACKGROUND,
@@ -93,8 +112,11 @@ class BoardList:
         #     #visible=(not self.horizontal)
         # )
 
-        self.view.update()
         print("containter content after: ", self.view.controls[1].content)
+
+    def setView(self):
+        self.header.controls[0].value += "x"
+        self.view.update()
 
     def addCard(self, e):
         self.hrztlCardList.controls.insert(
