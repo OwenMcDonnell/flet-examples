@@ -32,9 +32,9 @@ class Board:
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
         self.boardListsHash = {}
-        self.switchVal = False
         self.switch = Switch(
-            label="Horizontal/Veritcal List View", label_position="left", on_change=self.toggle_view)
+            label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view_test)
+        self.switchVal = 1 if self.switch.value else 0
         self.boardLists = [
             FloatingActionButton(
                 icon=icons.ADD, text="add a list", height=30, on_click=self.addListDlg)
@@ -63,31 +63,37 @@ class Board:
     # for each list in BoardLists list.horizontalView.visible = false, list.verticalView.visible = true
     def toggle_view(self, e):
         print("self.switch.value from change handler: ", self.switch.value)
-        self.switchVal = (not self.switchVal)
+        self.switchVal = 1 - self.switchVal
+        # self.horizontalWrap.visible = self.switch.value
+        # self.verticalWrap.visible = (not self.switch.value)
         # false means horizontal.
         index = 0
         for k, v in self.boardListsHash.items():
-            v.horizontal = (self.switchVal)
-            v.toggleView()
+            # v.horizontal = self.switch.value
+            v.toggleView(self.switchVal)
 
-            #self.boardLists[index] = v.view
+            # self.boardLists[index] = v.view
             index += 1
             # self.mainView.update()
             # self.app.page.update()
 
-        self.horizontalWrap.visible = self.switch.value
-        self.verticalWrap.visible = (not self.switch.value)
         # self.app.page.update()
         self.mainView.update()
 
     def toggle_view_test(self, e):
+        self.horizontalWrap.visible = (not self.switch.value)
+        self.verticalWrap.visible = (self.switch.value)
+        self.mainView.update()
+
         index = 0
         for k, v in self.boardListsHash.items():
-            v.setView()
+            #v.horizontal = self.switch.value
+            # v.setView()
+            v.list.controls[0].visible = self.switch.value
+            v.list.controls[1].visible = (not self.switch.value)
+            v.view.update()
             index += 1
-
-        # self.app.page.update()
-        self.mainView.update()
+        # self.app.update()
 
     def addList(self, list: BoardList):
         self.boardLists.append(list)
@@ -112,7 +118,7 @@ class Board:
             for k, v in optionDict.items():
                 if k == e.control.data:
                     v.bgcolor = colors.BLACK12
-                    #v.border = border.all(3, colors.BLACK26)
+                    # v.border = border.all(3, colors.BLACK26)
                     v.border_radius = border_radius.all(100)
                 else:
                     v.bgcolor = None
@@ -120,7 +126,7 @@ class Board:
             # colorOptions.update()
             # self.app.update()
 
-        #colorDisplay = Text(value="")
+        # colorDisplay = Text(value="")
         colorOptions = Row(data="")
 
         for k, v in optionDict.items():
@@ -135,7 +141,7 @@ class Board:
         def close_dlg(e):
             print("self.switch.value: ", self.switch.value,
                   type(self.switch.value))
-            newList = BoardList(self, e.control.value, self.switchVal,
+            newList = BoardList(self, e.control.value, self.switch.value,
                                 color=colorOptions.data)
 
             self.boardListsHash[e.control.value] = newList
@@ -147,7 +153,7 @@ class Board:
             dialog.open = False
 
             self.app.page.update()
-        #colorOptions = self.createColorChoice()
+        # colorOptions = self.createColorChoice()
         dialog = AlertDialog(
             title=Text("Name your new list"),
             content=Column(
@@ -159,7 +165,7 @@ class Board:
         self.app.page.update()
 
     def removeList(self, list: BoardList, e):
-        #blTuple = self.boardListsHash.pop(list.title)
+        # blTuple = self.boardListsHash.pop(list.title)
         # self.boardListsHorizontal.controls = [
         #     i for i in self.boardListsHorizontal.controls[1:] if i.data != list.title]
         # self.boardListsVertical.controls = [

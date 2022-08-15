@@ -55,9 +55,9 @@ class BoardList:
             "add card", icon=icons.ADD, on_click=self.addCard)])
         self.list = Column([
             Row([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not self.horizontal)),
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(horizontal)),
             Column([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(self.horizontal))
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
 
         ])
 
@@ -82,8 +82,8 @@ class BoardList:
 
         ], data=self.title)
 
-    def toggleView(self):
-        #self.horizontal = switch
+    def toggleView(self, switch):
+
         # print("containter content before: ", self.view.controls[1].content)
         # print("switch value: ", switch, self.horizontal)
         # newControl: any
@@ -97,10 +97,18 @@ class BoardList:
 
         # self.view.controls[1].content = self.vrtclCardList if switch else self.hrztlCardList
         # self.view.controls[1].content.controls visible = (switch)
-        self.list.controls[0].visible = (not self.horizontal)
-        self.list.controls[1].visible = (self.horizontal)
-
-        self.view.update()
+        # if switch == 1:
+        #     print("tick")
+        #     self.list.controls[0].visible = (False)
+        #     self.list.controls[1].visible = (True)
+        # else:
+        #     print("tock")
+        #     self.list.controls[0].visible = (True)
+        #     self.list.controls[1].visible = (False)
+        self.list.controls[0].visible = (bool(self.horizontal))
+        self.list.controls[1].visible = (not bool(self.horizontal))
+        self.horizontal = switch
+        # self.view.update()
         # self.view.controls[1].content = self.list
         # self.view.update()
         # self.view.controls[1] = Container(
@@ -112,11 +120,26 @@ class BoardList:
         #     #visible=(not self.horizontal)
         # )
 
-        print("containter content after: ", self.view.controls[1].content)
+        #print("containter content after: ", self.view.controls[1].content)
 
     def setView(self):
-        self.header.controls[0].value += "x"
+        print("switch value: ", self.horizontal)
+        if self.horizontal:
+            #self.header.controls[0].value += "x"
+            #self.view.controls[1].border_radius = border_radius.all(15)
+            self.board.horizontalWrap.visible = True
+            self.board.verticalWrap.visible = False
+            self.list.controls[0].visible = (True)
+            self.list.controls[1].visible = (False)
+        else:
+            #self.header.controls[0].value += "y"
+            #self.view.controls[1].border_radius = border_radius.all(0)
+            self.board.horizontalWrap.visible = False
+            self.board.verticalWrap.visible = True
+            self.list.controls[1].visible = (True)
+            self.list.controls[0].visible = (False)
         self.view.update()
+        # self.board.mainView.update()
 
     def addCard(self, e):
         self.hrztlCardList.controls.insert(
