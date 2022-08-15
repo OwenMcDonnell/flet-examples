@@ -1,11 +1,10 @@
-from cmath import exp
 import logging
 import os
 from itertools import islice
-from turtle import update
 from board import Board
 import flet
 from flet import (
+    UserControl,
     AlertDialog,
     Column,
     Container,

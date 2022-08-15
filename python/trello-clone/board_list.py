@@ -1,5 +1,5 @@
-
 from flet import (
+    UserControl,
     Column,
     Row,
     Switch,
@@ -30,7 +30,10 @@ class BoardList:
             TextButton(text="Save", on_click=self.save_title)
         ])
         self.cardInput = TextField(label="new card name", width=200)
-        self.header = Row(
+
+    def build(self):
+
+        header = Row(
 
             alignment="spaceBetween",
             controls=[
@@ -48,23 +51,23 @@ class BoardList:
             ],
         )
 
-        self.hrztlCardList = Row([self.cardInput, TextButton(
+        hrztlCardList = Row([self.cardInput, TextButton(
             "add card", icon=icons.ADD, on_click=self.addCard)])
 
-        self.vrtclCardList = Column([self.cardInput, TextButton(
+        vrtclCardList = Column([self.cardInput, TextButton(
             "add card", icon=icons.ADD, on_click=self.addCard)])
-        self.list = Column([
+        list = Column([
             Row([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(horizontal)),
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(self.horizontal)),
             Column([self.cardInput, TextButton(
-                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not horizontal))
+                "add card", icon=icons.ADD, on_click=self.addCard)], visible=(not self.horizontal))
 
         ])
 
-        self.view = Column([
-            self.header,
+        view = Column([
+            header,
             Container(
-                content=self.list,
+                content=list,
                 # border_radius=border_radius.all(15),
                 bgcolor=self.color if (
                     self.color != "") else colors.BACKGROUND,
@@ -82,45 +85,12 @@ class BoardList:
 
         ], data=self.title)
 
+        return view
+
     def toggleView(self, switch):
-
-        # print("containter content before: ", self.view.controls[1].content)
-        # print("switch value: ", switch, self.horizontal)
-        # newControl: any
-        # if self.horizontal:
-        #     newControl = Column([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)])
-
-        # else:
-        #     newControl = Row([self.cardInput, TextButton(
-        #         "add card", icon=icons.ADD, on_click=self.addCard)])
-
-        # self.view.controls[1].content = self.vrtclCardList if switch else self.hrztlCardList
-        # self.view.controls[1].content.controls visible = (switch)
-        # if switch == 1:
-        #     print("tick")
-        #     self.list.controls[0].visible = (False)
-        #     self.list.controls[1].visible = (True)
-        # else:
-        #     print("tock")
-        #     self.list.controls[0].visible = (True)
-        #     self.list.controls[1].visible = (False)
         self.list.controls[0].visible = (bool(self.horizontal))
         self.list.controls[1].visible = (not bool(self.horizontal))
         self.horizontal = switch
-        # self.view.update()
-        # self.view.controls[1].content = self.list
-        # self.view.update()
-        # self.view.controls[1] = Container(
-        #     content=self.list,
-        #     # border_radius=border_radius.all(15),
-        #     bgcolor=self.color if (
-        #         self.color != "") else colors.BACKGROUND,
-        #     padding=padding.all(20),
-        #     #visible=(not self.horizontal)
-        # )
-
-        #print("containter content after: ", self.view.controls[1].content)
 
     def setView(self):
         print("switch value: ", self.horizontal)
@@ -138,7 +108,7 @@ class BoardList:
             self.board.verticalWrap.visible = True
             self.list.controls[1].visible = (True)
             self.list.controls[0].visible = (False)
-        self.view.update()
+        self.update()
         # self.board.mainView.update()
 
     def addCard(self, e):
@@ -163,7 +133,7 @@ class BoardList:
         # )
 
         self.cardInput.value = ""
-        self.view.update()
+        self.update()
 
     def card_checked_H(self, e):
         print("card_checked event: ", e.control)
