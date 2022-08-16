@@ -4,7 +4,6 @@ from flet import (
     Row,
     FloatingActionButton,
     Text,
-    Checkbox,
     Switch,
     Container,
     TextField,
@@ -12,9 +11,6 @@ from flet import (
     AlertDialog,
     Container,
     Switch,
-    RadioGroup,
-    Radio,
-    Page,
     Icon,
     icons,
     border_radius,
@@ -27,13 +23,15 @@ from flet import (
 from board_list import BoardList
 
 
-class Board:
+class Board(UserControl):
     def __init__(self, app, identifier: str):
+        super().__init__()
+
         self.app = app
         self.identifier = identifier  # enforce uniqueness?
         self.boardListsHash = {}
         self.switch = Switch(
-            label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view_test)
+            label="Horizontal/Veritcal List View", value=False, label_position="left", on_change=self.toggle_view)
         self.switchVal = 1 if self.switch.value else 0
         self.boardLists = [
             FloatingActionButton(
@@ -41,7 +39,6 @@ class Board:
         ]
         self.horizontalWrap = Column(
             self.boardLists,
-            # vertical_alignment="start",
             wrap=True,
             visible=False
         )
@@ -59,46 +56,27 @@ class Board:
                 self.verticalWrap
             ])
 
+    def build(self):
+        self.view = Column(
+            controls=[
+                self.switch,
+                self.horizontalWrap,
+                self.verticalWrap
+            ])
+        return self.view
+
     # this method should ask the BoardLists to change view
     # for each list in BoardLists list.horizontalView.visible = false, list.verticalView.visible = true
     def toggle_view(self, e):
-        print("self.switch.value from change handler: ", self.switch.value)
-        self.switchVal = 1 - self.switchVal
-        # self.horizontalWrap.visible = self.switch.value
-        # self.verticalWrap.visible = (not self.switch.value)
-        # false means horizontal.
-        index = 0
-        for k, v in self.boardListsHash.items():
-            # v.horizontal = self.switch.value
-            v.toggleView(self.switchVal)
-
-            # self.boardLists[index] = v.view
-            index += 1
-            # self.mainView.update()
-            # self.app.page.update()
-
-        # self.app.page.update()
-        self.mainView.update()
-
-    def toggle_view_test(self, e):
-        self.horizontalWrap.visible = (not self.switch.value)
-        self.verticalWrap.visible = (self.switch.value)
-        self.mainView.update()
-
         index = 0
         for k, v in self.boardListsHash.items():
             #v.horizontal = self.switch.value
-            # v.setView()
-            v.list.controls[0].visible = self.switch.value
-            v.list.controls[1].visible = (not self.switch.value)
-            v.view.update()
+            v.setView()
             index += 1
-        # self.app.update()
-
-    def addList(self, list: BoardList):
-        self.boardLists.append(list)
-        # self.buildMainView(self.switch.value)
-        self.app.update()
+        self.horizontalWrap.visible = (self.switch.value)
+        self.verticalWrap.visible = (not self.switch.value)
+        self.update()
+        # self.app.page.update()
 
     def addListDlg(self, e):
 
@@ -123,10 +101,7 @@ class Board:
                 else:
                     v.bgcolor = None
             dialog.content.update()
-            # colorOptions.update()
-            # self.app.update()
 
-        # colorDisplay = Text(value="")
         colorOptions = Row(data="")
 
         for k, v in optionDict.items():
@@ -139,20 +114,15 @@ class Board:
             )
 
         def close_dlg(e):
-            print("self.switch.value: ", self.switch.value,
-                  type(self.switch.value))
             newList = BoardList(self, e.control.value, self.switch.value,
                                 color=colorOptions.data)
 
             self.boardListsHash[e.control.value] = newList
-            self.boardLists.insert(-1, newList.view)
+            self.boardLists.insert(-1, newList)
 
-            # self.mainView.update()
-
-            # self.app.update()
             dialog.open = False
-
             self.app.page.update()
+            self.update()
         # colorOptions = self.createColorChoice()
         dialog = AlertDialog(
             title=Text("Name your new list"),
@@ -165,11 +135,6 @@ class Board:
         self.app.page.update()
 
     def removeList(self, list: BoardList, e):
-        # blTuple = self.boardListsHash.pop(list.title)
-        # self.boardListsHorizontal.controls = [
-        #     i for i in self.boardListsHorizontal.controls[1:] if i.data != list.title]
-        # self.boardListsVertical.controls = [
-        #     i for i in self.boardListsVertical.controls[1:] if i.data != list.title]
         if list.horizontal:
             index = self.boardListsHorizontal.controls.index(list.view)
         else:
@@ -209,7 +174,6 @@ class Board:
         self.boardList.insert(i + displacement, list)
 
     def colorOptionCreator(self, color: str, name: str):
-
         return Container(
             content=Column(
                 [
@@ -221,7 +185,6 @@ class Board:
                         no_wrap=True,
                         text_align="center",
 
-                        # color=colors.ON_SURFACE_VARIANT,
                     ),
                 ],
                 # spacing=5,

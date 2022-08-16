@@ -88,7 +88,7 @@ class TrelloApp:
             [
                 self.sidebar,
                 VerticalDivider(width=2),
-                self.currentBoard.mainView
+                self.currentBoard
             ],
             expand=True,
         )
@@ -96,7 +96,7 @@ class TrelloApp:
     def update(self):
         self.currentBoard = self.boards[self.currentBoardIndex]
         self.page.update()
-        self.view.update()
+        # self.view.update()
 
     def navRail_change(self, e):
         self.currentBoardIndex = e.control.selected_index
@@ -134,11 +134,11 @@ class TrelloApp:
         )
         newBoard = Board(self, e.control.value)
         self.boards.append(newBoard)
-        self.view.controls.remove(self.boards[self.currentBoardIndex].mainView)
+        self.view.controls.remove(self.boards[self.currentBoardIndex])
         self.currentBoardIndex = len(self.sidebar.destinations) - 1
         print("from createNewBoard - currentBoardIndex: ", self.currentBoardIndex)
 
-        self.view.controls.append(self.boards[self.currentBoardIndex].mainView)
+        self.view.controls.append(self.boards[self.currentBoardIndex])
         self.sidebar.selected_index = self.currentBoardIndex
         self.update()
 
