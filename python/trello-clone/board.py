@@ -71,7 +71,7 @@ class Board(UserControl):
         index = 0
         for k, v in self.boardListsHash.items():
             #v.horizontal = self.switch.value
-            v.setView()
+            v.toggleView()
             index += 1
         self.horizontalWrap.visible = (self.switch.value)
         self.verticalWrap.visible = (not self.switch.value)

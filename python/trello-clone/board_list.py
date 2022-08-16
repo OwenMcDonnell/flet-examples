@@ -125,7 +125,7 @@ class BoardList(UserControl):
         self.horizontal = (not self.horizontal)
         self.view.controls[1].visible = (self.horizontal)
         self.view.controls[2].visible = (not self.horizontal)
-        # self.update()
+        self.update()
 
     def addCard(self, e):
         self.hrztlCardList.controls.insert(
