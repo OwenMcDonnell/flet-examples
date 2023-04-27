@@ -1,4 +1,8 @@
+import os
 import flet
+from flet.auth.providers.auth0_oauth_provider import Auth0OAuthProvider
+from flet.auth.providers.github_oauth_provider import GitHubOAuthProvider
+from flet.auth.providers.google_oauth_provider import GoogleOAuthProvider
 from app_layout import AppLayout
 from board import Board
 from data_store import DataStore
@@ -28,6 +32,12 @@ from flet import (
 from memory_store import InMemoryStore
 from user import User
 
+AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
+assert AUTH0_DOMAIN, "set AUTH0_DOMAIN environment variable"
+AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
+assert AUTH0_CLIENT_ID, "set AUTH0_CLIENT_ID environment variable"
+AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
+assert AUTH0_CLIENT_SECRET, "set AUTH0_CLIENT_SECRET environment variable"
 
 class TrelloApp(UserControl):
     def __init__(self, page: Page, store: DataStore):
@@ -105,16 +115,29 @@ class TrelloApp(UserControl):
                 text=f"{self.page.client_storage.get('current_user')}'s Profile"
             )
             self.page.update()
+        def auth0_login_click(e):
+            provider = Auth0OAuthProvider(
+                domain=os.getenv("AUTH0_DOMAIN"),
+                client_id=os.getenv("AUTH0_CLIENT_ID"),
+                client_secret=os.getenv("AUTH0_CLIENT_SECRET")
+            )
+            self.page.login(provider)
+        def github_login_click(e):
+            pass
+        def google_login_click(e):
+            pass    
 
-        user_name = TextField(label="User name")
-        password = TextField(label="Password", password=True)
+        auth0_button = ElevatedButton("Login with Auth0", on_click=auth0_login_click)
+        github_button = ElevatedButton("Login with Github", on_click=github_login_click, disabled=True)
+        google_button = ElevatedButton("Login with Google", on_click=google_login_click, disabled=True)
         dialog = AlertDialog(
-            title=Text("Please enter your login credentials"),
+            title=Text("Choose an Identity Provider"),
             content=Column(
                 [
-                    user_name,
-                    password,
-                    ElevatedButton(text="Login", on_click=close_dlg),
+                    auth0_button,
+                    github_button,
+                    google_button
+
                 ],
                 tight=True,
             ),
