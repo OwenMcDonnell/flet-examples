@@ -97,31 +97,33 @@ class TrelloApp(UserControl):
         self.page.go("/")
 
     def login(self, e):
-        def close_dlg(e):
-            if user_name.value == "" or password.value == "":
-                user_name.error_text = "Please provide username"
-                password.error_text = "Please provide password"
-                self.page.update()
-                return
-            else:
-                user = User(user_name.value, password.value)
-                if user not in self.store.get_users():
-                    self.store.add_user(user)
-                self.user = user_name.value
-                self.page.client_storage.set("current_user", user_name.value)
+        # def close_dlg(e):
+        #     if user_name.value == "" or password.value == "":
+        #         user_name.error_text = "Please provide username"
+        #         password.error_text = "Please provide password"
+        #         self.page.update()
+        #         return
+        #     else:
+        #         user = User(user_name.value, password.value)
+        #         if user not in self.store.get_users():
+        #             self.store.add_user(user)
+        #         self.user = user_name.value
+        #         self.page.client_storage.set("current_user", user_name.value)
 
-            dialog.open = False
-            self.appbar_items[0] = PopupMenuItem(
-                text=f"{self.page.client_storage.get('current_user')}'s Profile"
-            )
-            self.page.update()
+        #     dialog.open = False
+        #     self.appbar_items[0] = PopupMenuItem(
+        #         text=f"{self.page.client_storage.get('current_user')}'s Profile"
+        #     )
+        #     self.page.update()
         def auth0_login_click(e):
             provider = Auth0OAuthProvider(
                 domain=os.getenv("AUTH0_DOMAIN"),
                 client_id=os.getenv("AUTH0_CLIENT_ID"),
-                client_secret=os.getenv("AUTH0_CLIENT_SECRET")
+                client_secret=os.getenv("AUTH0_CLIENT_SECRET"),
+                redirect_url="http://localhost:8080/api/oauth/redirect"
             )
             self.page.login(provider)
+
         def github_login_click(e):
             pass
         def google_login_click(e):
@@ -229,5 +231,6 @@ def main(page: Page):
     page.update()
     app.initialize()
 
+print("flet dir: ", flet.__path__)
 
-flet.app(target=main, assets_dir="../assets")
+flet.app(target=main, port=8080, assets_dir="../assets")
